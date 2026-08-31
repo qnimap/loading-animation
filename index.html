@@ -235,7 +235,8 @@ function createHoleSector(angle, holeRadius = 75) {
   // 円のアニメーション用
   const animation = {
     angle: 0,
-    holeRadius: 75
+    holeRadius: 75,
+    scale: 1
   };
 
   // タイムライン作成
@@ -296,7 +297,7 @@ function createHoleSector(angle, holeRadius = 75) {
   })
 
 .to(animation, {
-  holeRadius: 750,
+  scale: 10,
   duration: 1.5,
   ease: "power4.in",
 
@@ -305,7 +306,10 @@ function createHoleSector(angle, holeRadius = 75) {
       .querySelector("#mask-hole")
       .setAttribute(
         "d",
-        createHoleSector(animation.angle, animation.holeRadius)
+        createHoleSector(
+          animation.angle,
+          75 * animation.scale
+        )
       );
   }
 }, "<")
