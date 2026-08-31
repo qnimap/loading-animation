@@ -238,7 +238,6 @@ function createHoleSector(angle, holeRadius = 75) {
   const animation = {
     angle: 0,
     holeRadius: 75,
-    scale: 1
   };
 
   // タイムライン作成
@@ -299,7 +298,7 @@ function createHoleSector(angle, holeRadius = 75) {
   })
 
 .to(animation, {
-  scale: 10,
+  holeRadius: 1800,
   duration: 1.5,
   ease: "power4.in",
 
@@ -310,7 +309,7 @@ function createHoleSector(angle, holeRadius = 75) {
         "d",
         createHoleSector(
           animation.angle,
-          75 * animation.scale
+          animation.holeRadius
         )
       );
   }
