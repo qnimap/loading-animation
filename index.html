@@ -15,6 +15,7 @@ body {
 #loader {
   width: 100vw;
   height: 100vh;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -231,10 +232,27 @@ function createHoleSector(angle, holeRadius = 75) {
     transformOrigin: "center center"
   });
 
+
+// ロゴと背景SVGの実際の表示サイズを取得
+const logoElement = document.querySelector("#logo svg");
+const bgElement = document.querySelector("#loader-bg");
+
+const logoWidth = logoElement.getBoundingClientRect().width;
+const bgRect = bgElement.getBoundingClientRect();
+
+// 背景SVGのviewBox座標(1000)を実際の画面サイズに換算
+const svgScale = bgRect.width / 1000;
+
+// ロゴの円のサイズを基準に穴の半径を計算
+const initialHoleRadius = (logoWidth * 0.5) / svgScale;
+
+// ロゴが10倍になるので穴も10倍
+const finalHoleRadius = initialHoleRadius * 10;
+
   // 円のアニメーション用
   const animation = {
     angle: 0,
-    holeRadius: 75
+    holeRadius: initialHoleRadius
   };
 
   // タイムライン作成
@@ -295,7 +313,7 @@ function createHoleSector(angle, holeRadius = 75) {
   })
 
 .to(animation, {
-  holeRadius: 750,
+  holeRadius: finalHoleRadius,
   duration: 1.5,
   ease: "power4.in",
 
