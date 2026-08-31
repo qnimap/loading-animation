@@ -144,14 +144,13 @@ body {
 
 <script>
 
-
-
   // SVGの中心
   const cx = 495.91;
   const cy = 515.93;
 
   // SVG全体を覆える半径
   const radius = 1500;
+
 
   // 扇形のパスを作る関数
   function createSector(angle) {
@@ -176,162 +175,216 @@ body {
 
 
   // 穴用の円形扇形を作る
-function createHoleSector(angle, holeRadius = 75) {
-  const holeCx = 500;
-  const holeCy = 500;
+  function createHoleSector(angle, holeRadius = 75) {
 
-  // 開始位置
-  const startAngle = -70;
+    const holeCx = 500;
+    const holeCy = 500;
 
-  // 線と同じく反時計回り
-  const endAngle = startAngle - angle;
+    const startAngle = -70;
+    const endAngle = startAngle - angle;
 
-  const startX =
-    holeCx + holeRadius * Math.cos(startAngle * Math.PI / 180);
+    const startX =
+      holeCx + holeRadius * Math.cos(startAngle * Math.PI / 180);
 
-  const startY =
-    holeCy + holeRadius * Math.sin(startAngle * Math.PI / 180);
+    const startY =
+      holeCy + holeRadius * Math.sin(startAngle * Math.PI / 180);
 
-  const endX =
-    holeCx + holeRadius * Math.cos(endAngle * Math.PI / 180);
+    const endX =
+      holeCx + holeRadius * Math.cos(endAngle * Math.PI / 180);
 
-  const endY =
-    holeCy + holeRadius * Math.sin(endAngle * Math.PI / 180);
+    const endY =
+      holeCy + holeRadius * Math.sin(endAngle * Math.PI / 180);
 
-  const largeArcFlag = angle > 180 ? 1 : 0;
+    const largeArcFlag = angle > 180 ? 1 : 0;
 
-  // 最初は穴なし
-  if (angle <= 0) {
-    return "";
-  }
 
-  // 一周したら完全な円
-  if (angle >= 359.9) {
+    // 最初は穴なし
+    if (angle <= 0) {
+      return "";
+    }
+
+
+    // 一周したら完全な円
+    if (angle >= 359.9) {
+      return `
+        M ${holeCx - holeRadius} ${holeCy}
+        a ${holeRadius} ${holeRadius} 0 1 0 ${holeRadius * 2} 0
+        a ${holeRadius} ${holeRadius} 0 1 0 ${-holeRadius * 2} 0
+      `;
+    }
+
+
     return `
-      M ${holeCx - holeRadius} ${holeCy}
-      a ${holeRadius} ${holeRadius} 0 1 0 ${holeRadius * 2} 0
-      a ${holeRadius} ${holeRadius} 0 1 0 ${-holeRadius * 2} 0
+      M ${holeCx} ${holeCy}
+      L ${startX} ${startY}
+      A ${holeRadius} ${holeRadius}
+        0 ${largeArcFlag} 0
+        ${endX} ${endY}
+      Z
     `;
   }
 
-  return `
-    M ${holeCx} ${holeCy}
-    L ${startX} ${startY}
-    A ${holeRadius} ${holeRadius}
-      0 ${largeArcFlag} 0
-      ${endX} ${endY}
-    Z
-  `;
-}
 
-  // 最初は文字を隠しておく
-  gsap.set("#character", {
-    opacity: 0,
-    scale: 0.8,
-    rotation: 0,
-    transformOrigin: "center center"
-  });
-
-
-// ロゴと背景SVGの実際の表示サイズを取得
-const logoElement = document.querySelector("#logo svg");
-const bgElement = document.querySelector("#loader-bg");
-
-const logoWidth = logoElement.getBoundingClientRect().width;
-const bgRect = bgElement.getBoundingClientRect();
-
-// 背景SVGのviewBox座標(1000)を実際の画面サイズに換算
-const svgScale = bgRect.width / 1000;
-
-// ロゴの円のサイズを基準に穴の半径を計算
-const initialHoleRadius = (logoWidth * 0.5) / svgScale;
-
-// ロゴが10倍になるので穴も10倍
-const finalHoleRadius = initialHoleRadius * 10;
-
-  // 円のアニメーション用
+  // アニメーション用オブジェクト
   const animation = {
     angle: 0,
-    holeRadius: initialHoleRadius
+    holeRadius: 0
   };
 
-  // タイムライン作成
-  const tl = gsap.timeline();
 
-  // ① 線が上から反時計回りに現れる
-  tl.to(animation, {
-    angle: 359.99,
-    duration: 2.5,
-    ease: "power3.in",
+  // ページの読み込み完了後に開始
+  window.addEventListener("load", () => {
 
-    onUpdate: () => {
-      document
-        .querySelector("#revealShape")
-        .setAttribute("d", createSector(animation.angle));
-
-          // 同じ進行度で穴もぐるっと作る
-  document
-    .querySelector("#mask-hole")
-    .setAttribute("d", createHoleSector(animation.angle, animation.holeRadius));
-    },
-
-    
-    onComplete: () => {
-      document
-        .querySelector("#line")
-        .removeAttribute("clip-path");
-    }
-  })
-
-  // ② 少し間を空ける
-  .to({}, {
-    duration: 0.2
-  })
-
-  // ③ 文字が現れて少し大きく・傾く
-  .to("#character", {
-    opacity: 1,
-    scale: 1.15,
-    rotation: -8,
-    duration: 0.18,
-    ease: "power2.out"
-  })
-
-  // ④ 元の状態に戻る
-  .to("#character", {
-    scale: 1,
-    rotation: 0,
-    duration: 0.3,
-    ease: "elastic.out(1, 0.5)"
-  })
-
-  // ⑤ ロゴ全体を少し待ってから拡大
-  .to("#logo", {
-    scale: 10,
-    duration: 1.5,
-    ease: "power4.in"
-  })
-
-.to(animation, {
-  holeRadius: finalHoleRadius,
-  duration: 1.5,
-  ease: "power4.in",
-
-  onUpdate: () => {
-    document
-      .querySelector("#mask-hole")
-      .setAttribute(
-        "d",
-        createHoleSector(animation.angle, animation.holeRadius)
-      );
-  }
-}, "<")
+    // iframeのサイズ確定を少し待つ
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
 
 
+        // 最初は文字を隠しておく
+        gsap.set("#character", {
+          opacity: 0,
+          scale: 0.8,
+          rotation: 0,
+          transformOrigin: "center center"
+        });
 
-.set("#loader", {
-  display: "none"
-});
+
+        // ロゴと背景SVGを取得
+        const logoElement = document.querySelector("#logo svg");
+        const bgElement = document.querySelector("#loader-bg");
+
+
+        // 実際の表示サイズを取得
+        const logoRect =
+          logoElement.getBoundingClientRect();
+
+        const bgRect =
+          bgElement.getBoundingClientRect();
+
+
+        // preserveAspectRatio="slice"を考慮した倍率
+        const svgScale = Math.max(
+          bgRect.width / 1000,
+          bgRect.height / 1000
+        );
+
+
+        // ロゴ幅の50%を穴の半径にする
+        const initialHoleRadius =
+          (logoRect.width * 0.5) / svgScale;
+
+
+        // ロゴが10倍になるので穴も10倍
+        const finalHoleRadius =
+          initialHoleRadius * 10;
+
+
+        // 初期値を設定
+        animation.holeRadius =
+          initialHoleRadius;
+
+
+        // タイムライン作成
+        const tl = gsap.timeline();
+
+
+        // ① 線と穴が同時にぐるっと現れる
+        tl.to(animation, {
+          angle: 359.99,
+          duration: 2.5,
+          ease: "power3.in",
+
+          onUpdate: () => {
+
+            document
+              .querySelector("#revealShape")
+              .setAttribute(
+                "d",
+                createSector(animation.angle)
+              );
+
+
+            document
+              .querySelector("#mask-hole")
+              .setAttribute(
+                "d",
+                createHoleSector(
+                  animation.angle,
+                  animation.holeRadius
+                )
+              );
+          },
+
+          onComplete: () => {
+            document
+              .querySelector("#line")
+              .removeAttribute("clip-path");
+          }
+        })
+
+
+        // ② 少し間を空ける
+        .to({}, {
+          duration: 0.2
+        })
+
+
+        // ③ 文字が現れる
+        .to("#character", {
+          opacity: 1,
+          scale: 1.15,
+          rotation: -8,
+          duration: 0.18,
+          ease: "power2.out"
+        })
+
+
+        // ④ 元に戻る
+        .to("#character", {
+          scale: 1,
+          rotation: 0,
+          duration: 0.3,
+          ease: "elastic.out(1, 0.5)"
+        })
+
+
+        // ⑤ ロゴ全体を拡大
+        .to("#logo", {
+          scale: 10,
+          duration: 1.5,
+          ease: "power4.in"
+        })
+
+
+        // ロゴと同時に穴も拡大
+        .to(animation, {
+          holeRadius: finalHoleRadius,
+          duration: 1.5,
+          ease: "power4.in",
+
+          onUpdate: () => {
+            document
+              .querySelector("#mask-hole")
+              .setAttribute(
+                "d",
+                createHoleSector(
+                  animation.angle,
+                  animation.holeRadius
+                )
+              );
+          }
+        }, "<")
+
+
+        // ローダーを消す
+        .set("#loader", {
+          display: "none"
+        });
+
+      });
+    });
+
+  });
 
 </script>
 
