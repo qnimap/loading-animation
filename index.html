@@ -70,7 +70,7 @@ body {
 <svg
   id="loader-bg"
   viewBox="0 0 1000 1000"
-  preserveAspectRatio="xMidYMid meet"
+  preserveAspectRatio="xMidYMid slice"
 >
   <defs>
     <mask
@@ -228,7 +228,7 @@ body {
   // アニメーション用オブジェクト
   const animation = {
     angle: 0,
-    holeRadius: 75
+    holeRadius: 0
   };
 
 
@@ -249,7 +249,40 @@ body {
         });
 
 
-        
+        // ロゴと背景SVGを取得
+        const logoElement = document.querySelector("#logo svg");
+        const bgElement = document.querySelector("#loader-bg");
+
+
+        // 実際の表示サイズを取得
+        const logoRect =
+          logoElement.getBoundingClientRect();
+
+        const bgRect =
+          bgElement.getBoundingClientRect();
+
+
+        // preserveAspectRatio="slice"を考慮した倍率
+        const svgScale = Math.max(
+          bgRect.width / 1000,
+          bgRect.height / 1000
+        );
+
+
+        // ロゴ幅の50%を穴の半径にする
+        const initialHoleRadius =
+          (logoRect.width * 0.5) / svgScale;
+
+
+        // ロゴが10倍になるので穴も10倍
+        const finalHoleRadius =
+          initialHoleRadius * 10;
+
+
+        // 初期値を設定
+        animation.holeRadius =
+          initialHoleRadius;
+
 
         // タイムライン作成
         const tl = gsap.timeline();
@@ -325,7 +358,7 @@ body {
 
         // ロゴと同時に穴も拡大
         .to(animation, {
-          holeRadius: 750,
+          holeRadius: finalHoleRadius,
           duration: 1.5,
           ease: "power4.in",
 
