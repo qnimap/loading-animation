@@ -15,13 +15,12 @@ body {
 #loader {
   width: 100vw;
   height: 100vh;
-
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-#loader svg {
+#logo svg {
   width: 200px;
   max-width: 80vw;
 }
@@ -36,12 +35,7 @@ body {
 
 
 
-#loader-bg {
-  position: absolute;
-  inset: 0;
-  background: white;
-  z-index: 0;
-}
+
 
 #logo {
   position: relative;
@@ -49,25 +43,12 @@ body {
 }
 
 #loader-bg {
-  --hole-size: 98px;
-
   position: absolute;
   inset: 0;
-  background: white;
-
-  -webkit-mask-image: radial-gradient(
-    circle at 50% 50%,
-    transparent 0px,
-    transparent var(--hole-size),
-    black calc(var(--hole-size) + 1px)
-  );
-
-  mask-image: radial-gradient(
-    circle at 50% 50%,
-    transparent 0px,
-    transparent var(--hole-size),
-    black calc(var(--hole-size) + 1px)
-  );
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
 }
 
 
@@ -81,19 +62,48 @@ body {
 
 
 
-<div id="loader-bg"></div>
+
 
 <!-- ローディング画面 -->
   <div id="loader">
-     <svg id="loader-bg"
-         width="100%"
-         height="100%"
-         viewBox="0 0 1000 1000"
-         preserveAspectRatio="none">
+<svg
+  id="loader-bg"
+  viewBox="0 0 1000 1000"
+  preserveAspectRatio="xMidYMid slice"
+>
+  <defs>
+    <mask
+      id="loader-mask"
+      maskUnits="userSpaceOnUse"
+      maskContentUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="1000"
+      height="1000"
+    >
+      <!-- 白い部分 = 表示 -->
+      <rect
+        width="1000"
+        height="1000"
+        fill="white"
+      />
 
+      <!-- 黒い部分 = 透明 -->
+      <path
+        id="mask-hole"
+        fill="black"
+      />
+    </mask>
+  </defs>
 
-    </svg>
-
+  <!-- 白い背景 -->
+  <rect
+    width="1000"
+    height="1000"
+    fill="white"
+    mask="url(#loader-mask)"
+  />
+</svg>
 
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -129,7 +139,10 @@ body {
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 
+
+
 <script>
+
 
 
   // SVGの中心
@@ -160,6 +173,56 @@ body {
     `;
   }
 
+
+  // 穴用の円形扇形を作る
+function createHoleSector(angle, holeRadius = 75) {
+  const holeCx = 500;
+  const holeCy = 500;
+
+  // 開始位置
+  const startAngle = -70;
+
+  // 線と同じく反時計回り
+  const endAngle = startAngle - angle;
+
+  const startX =
+    holeCx + holeRadius * Math.cos(startAngle * Math.PI / 180);
+
+  const startY =
+    holeCy + holeRadius * Math.sin(startAngle * Math.PI / 180);
+
+  const endX =
+    holeCx + holeRadius * Math.cos(endAngle * Math.PI / 180);
+
+  const endY =
+    holeCy + holeRadius * Math.sin(endAngle * Math.PI / 180);
+
+  const largeArcFlag = angle > 180 ? 1 : 0;
+
+  // 最初は穴なし
+  if (angle <= 0) {
+    return "";
+  }
+
+  // 一周したら完全な円
+  if (angle >= 359.9) {
+    return `
+      M ${holeCx - holeRadius} ${holeCy}
+      a ${holeRadius} ${holeRadius} 0 1 0 ${holeRadius * 2} 0
+      a ${holeRadius} ${holeRadius} 0 1 0 ${-holeRadius * 2} 0
+    `;
+  }
+
+  return `
+    M ${holeCx} ${holeCy}
+    L ${startX} ${startY}
+    A ${holeRadius} ${holeRadius}
+      0 ${largeArcFlag} 0
+      ${endX} ${endY}
+    Z
+  `;
+}
+
   // 最初は文字を隠しておく
   gsap.set("#character", {
     opacity: 0,
@@ -170,7 +233,8 @@ body {
 
   // 円のアニメーション用
   const animation = {
-    angle: 0
+    angle: 0,
+    holeRadius: 75
   };
 
   // タイムライン作成
@@ -186,8 +250,14 @@ body {
       document
         .querySelector("#revealShape")
         .setAttribute("d", createSector(animation.angle));
+
+          // 同じ進行度で穴もぐるっと作る
+  document
+    .querySelector("#mask-hole")
+    .setAttribute("d", createHoleSector(animation.angle, animation.holeRadius));
     },
 
+    
     onComplete: () => {
       document
         .querySelector("#line")
@@ -224,16 +294,23 @@ body {
     ease: "power4.in"
   })
 
-  .to("#loader-bg", {
-  "--hole-size": "900px",
+.to(animation, {
+  holeRadius: 750,
   duration: 1.5,
-  ease: "power4.in"
+  ease: "power4.in",
+
+  onUpdate: () => {
+    document
+      .querySelector("#mask-hole")
+      .setAttribute(
+        "d",
+        createHoleSector(animation.angle, animation.holeRadius)
+      );
+  }
 }, "<")
 
-.to("#loader", {
-  opacity: 0,
-  duration: 0.1
-})
+
+
 .set("#loader", {
   display: "none"
 });
