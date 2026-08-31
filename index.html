@@ -16,7 +16,9 @@ body {
   position: relative;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #logo svg {
@@ -37,12 +39,8 @@ body {
 
 
 #logo {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  position: relative;
   z-index: 1;
-
-  transform: translate(-50%, -50%);
 }
 
 #loader-bg {
@@ -234,34 +232,12 @@ function createHoleSector(angle, holeRadius = 75) {
     transformOrigin: "center center"
   });
 
-  function getHoleRadius() {
-  const logoSvg = document.querySelector("#logo svg");
-  const bgSvg = document.querySelector("#loader-bg");
-
-  const logoRect = logoSvg.getBoundingClientRect();
-  const bgRect = bgSvg.getBoundingClientRect();
-
-  // 背景SVGの実際の縮尺
-  const scale = Math.max(
-    bgRect.width / 1000,
-    bgRect.height / 1000
-  );
-
-  // ロゴ幅の半分を穴の半径に変換
-  return (logoRect.width / 2) / scale;
-}
-
   // 円のアニメーション用
   const animation = {
     angle: 0,
-    holeRadius: 0,
+    holeRadius: 75,
+    scale: 1
   };
-
-
-  const initialHoleRadius = getHoleRadius();
-const finalHoleRadius = initialHoleRadius * 10;
-
-animation.holeRadius = initialHoleRadius;
 
   // タイムライン作成
   const tl = gsap.timeline();
@@ -321,7 +297,7 @@ animation.holeRadius = initialHoleRadius;
   })
 
 .to(animation, {
-  holeRadius: finalHoleRadius,
+  holeRadius: 750,
   duration: 1.5,
   ease: "power4.in",
 
