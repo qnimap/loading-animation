@@ -9,13 +9,12 @@
   <style>
 body {
   margin: 0;
-  background: blue;
+  background: transparent;
 }
 
 #loader {
   width: 100vw;
   height: 100vh;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -232,9 +231,6 @@ function createHoleSector(angle, holeRadius = 75) {
     transformOrigin: "center center"
   });
 
-
-
-  
   // 円のアニメーション用
   const animation = {
     angle: 0,
@@ -299,7 +295,7 @@ function createHoleSector(angle, holeRadius = 75) {
   })
 
 .to(animation, {
-  holeRadius: 750,
+  holeRadius: 1500,
   duration: 1.5,
   ease: "power4.in",
 
@@ -312,7 +308,6 @@ function createHoleSector(angle, holeRadius = 75) {
       );
   }
 }, "<")
-
 
 
 .set("#loader", {
