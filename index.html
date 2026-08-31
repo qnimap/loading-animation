@@ -234,11 +234,34 @@ function createHoleSector(angle, holeRadius = 75) {
     transformOrigin: "center center"
   });
 
+  function getHoleRadius() {
+  const logoSvg = document.querySelector("#logo svg");
+  const bgSvg = document.querySelector("#loader-bg");
+
+  const logoRect = logoSvg.getBoundingClientRect();
+  const bgRect = bgSvg.getBoundingClientRect();
+
+  // 背景SVGの実際の縮尺
+  const scale = Math.max(
+    bgRect.width / 1000,
+    bgRect.height / 1000
+  );
+
+  // ロゴ幅の半分を穴の半径に変換
+  return (logoRect.width / 2) / scale;
+}
+
   // 円のアニメーション用
   const animation = {
     angle: 0,
-    holeRadius: 75,
+    holeRadius: 0,
   };
+
+
+  const initialHoleRadius = getHoleRadius();
+const finalHoleRadius = initialHoleRadius * 10;
+
+animation.holeRadius = initialHoleRadius;
 
   // タイムライン作成
   const tl = gsap.timeline();
@@ -298,7 +321,7 @@ function createHoleSector(angle, holeRadius = 75) {
   })
 
 .to(animation, {
-  holeRadius: 1800,
+  holeRadius: finalHoleRadius,
   duration: 1.5,
   ease: "power4.in",
 
