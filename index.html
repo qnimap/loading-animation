@@ -313,17 +313,7 @@ function createHoleSector(angle, holeRadius = 75) {
       "scale"
     );
 
-const bg = document.querySelector("#loader-bg");
-const bgWidth = bg.getBoundingClientRect().width;
-
-const svgScale = bgWidth / 1000;
-
-// ロゴの半径（画面上のpx）
-const logoRadius = 75;
-
-// SVG座標に変換した穴の半径
-const holeRadius =
-  (logoRadius / svgScale) * currentScale;
+    const holeRadius = 75 * currentScale;
 
     document
       .querySelector("#mask-hole")
