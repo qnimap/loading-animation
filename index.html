@@ -249,10 +249,10 @@ function createHoleSector(angle, holeRadius = 75) {
     scale: 1
   };
 
+
+  
   // タイムライン作成
-  const tl = gsap.timeline({
-  paused: true
-});
+  const tl = gsap.timeline();
 
   // ① 線が上から反時計回りに現れる
   tl.to(animation, {
@@ -313,7 +313,17 @@ function createHoleSector(angle, holeRadius = 75) {
       "scale"
     );
 
-    const holeRadius = 75 * currentScale;
+const bg = document.querySelector("#loader-bg");
+const bgWidth = bg.getBoundingClientRect().width;
+
+const svgScale = bgWidth / 1000;
+
+// ロゴの半径（画面上のpx）
+const logoRadius = 100;
+
+// SVG座標に変換した穴の半径
+const holeRadius =
+  (logoRadius / svgScale) * currentScale;
 
     document
       .querySelector("#mask-hole")
@@ -333,8 +343,6 @@ function createHoleSector(angle, holeRadius = 75) {
 .set("#loader", {
   display: "none"
 });
-
-  tl.seek(3.18);
 
 </script>
 
