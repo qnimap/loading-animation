@@ -250,7 +250,9 @@ function createHoleSector(angle, holeRadius = 75) {
   };
 
   // タイムライン作成
-  const tl = gsap.timeline();
+  const tl = gsap.timeline({
+  paused: true
+});
 
   // ① 線が上から反時計回りに現れる
   tl.to(animation, {
