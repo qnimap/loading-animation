@@ -9,7 +9,7 @@
   <style>
 body {
   margin: 0;
-  background: transparent;
+  background: blue;
 }
 
 #loader {
@@ -242,10 +242,27 @@ function createHoleSector(angle, holeRadius = 75) {
     transformOrigin: "center center"
   });
 
+
+// 穴の基準サイズ
+const baseHoleRadius = 100;
+
+// 背景SVGの表示倍率を取得
+const bgElement = document.querySelector("#loader-bg");
+const bgRect = bgElement.getBoundingClientRect();
+
+const scaleX = bgRect.width / 1000;
+const scaleY = bgRect.height / 1000;
+
+// preserveAspectRatio="slice" に合わせた実際の倍率
+const bgScale = Math.max(scaleX, scaleY);
+
+// PC基準の穴サイズを端末ごとに補正
+const responsiveHoleRadius = baseHoleRadius / bgScale;
+
   // 円のアニメーション用
   const animation = {
     angle: 0,
-    holeRadius: 75,
+    holeRadius: responsiveHoleRadius,
     scale: 1
   };
 
@@ -311,7 +328,7 @@ function createHoleSector(angle, holeRadius = 75) {
       "scale"
     );
 
-    const holeRadius = 75 * currentScale;
+    const holeRadius = responsiveHoleRadius * currentScale;
 
     document
       .querySelector("#mask-hole")
